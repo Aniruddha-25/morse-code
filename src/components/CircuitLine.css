@@ -60,11 +60,3 @@
     background-color 0.3s ease,
     box-shadow 0.3s ease;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .circuit-line__signal,
-  .circuit-line--lit .circuit-line__signal {
-    transition-duration: 0.01ms;
-    transition-delay: 0s;
-  }
-}

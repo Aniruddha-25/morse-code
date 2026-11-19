@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { findNode } from '../morse/morseDecoder'
+import { decodeSequence } from '../morse/morseDecoder'
 import { symbolGlyph } from '../morse/morseData'
 import type { MorseSymbol } from '../morse/types'
 import './MorseDisplay.css'
@@ -20,7 +20,7 @@ export const MorseDisplay = memo(function MorseDisplay({
   notice,
   onReset,
 }: MorseDisplayProps) {
-  const candidate = findNode(sequence)?.letter ?? null
+  const candidate = decodeSequence(sequence)
   const hasContent = sequence.length > 0 || text.length > 0
 
   return (

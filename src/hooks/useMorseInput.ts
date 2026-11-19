@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react'
-import { DEFAULT_TIMING } from '../morse/config'
-import { findNode } from '../morse/morseDecoder'
-import type { MorseSymbol, MorseTiming } from '../morse/types'
+import { useCallback, useEffect, useReducer } from 'react'
+import { symbolGlyph } from '../morse/morseData'
+import { decodeSequence, findNode } from '../morse/morseDecoder'
+import type { MorseSymbol } from '../morse/types'
 
 interface InputError {
   readonly id: number
@@ -24,7 +24,8 @@ export type Action =
 
 export const INITIAL_STATE: State = { sequence: [], text: '', error: null }
 
-const GLYPH: Record<MorseSymbol, string> = { '.': '·', '-': '−' }
+/** How long the red "invalid input" flash lasts. */
+const ERROR_FLASH_MS = 800
 
 function withError(state: State, text: string): State {
   return { ...state, error: { id: (state.error?.id ?? 0) + 1, text } }
@@ -36,7 +37,7 @@ export function reducer(state: State, action: Action): State {
       const sequence = [...state.sequence, action.symbol]
       if (!findNode(sequence)) {
         // Nothing continues this way (e.g. ·−−−−−): flash red, keep the valid sequence.
-        return withError(state, `No character continues with ${GLYPH[action.symbol]}`)
+        return withError(state, `No character continues with ${symbolGlyph(action.symbol)}`)
       }
       return { ...state, sequence, error: null }
     }
@@ -57,10 +58,10 @@ export function reducer(state: State, action: Action): State {
         if (state.text === '' || state.text.endsWith(' ')) return state
         return { ...state, text: state.text + ' ', error: null }
       }
-      const character = findNode(state.sequence)?.letter
+      const character = decodeSequence(state.sequence)
       if (!character) {
         // A valid prefix, but not a character yet (e.g. ··−−): keep it and flash.
-        return withError(state, `${state.sequence.map((s) => GLYPH[s]).join(' ')} is not a character`)
+        return withError(state, `${state.sequence.map(symbolGlyph).join(' ')} is not a character`)
       }
       // Save it, clear the sequence (which turns the circuit off) for the next character.
       return { sequence: [], text: state.text + character, error: null }
@@ -99,12 +100,6 @@ function usesNativeKeys(event: KeyboardEvent): boolean {
   return target instanceof Element && target.closest('[data-native-keys]') !== null
 }
 
-export interface UseMorseInputOptions {
-  timing?: Partial<MorseTiming>
-  /** Listen for Alt (dot), Space (dash), Enter (confirm) and Backspace (delete). Default true. */
-  keyboard?: boolean
-}
-
 export interface UseMorseInput {
   sequence: readonly MorseSymbol[]
   /** Characters confirmed so far. */
@@ -118,9 +113,7 @@ export interface UseMorseInput {
   reset: () => void
 }
 
-export function useMorseInput(options: UseMorseInputOptions = {}): UseMorseInput {
-  const { keyboard = true } = options
-  const { errorFlashMs } = { ...DEFAULT_TIMING, ...options.timing }
+export function useMorseInput(): UseMorseInput {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
 
   const addDot = useCallback(() => dispatch({ type: 'symbol', symbol: '.' }), [])
@@ -134,12 +127,11 @@ export function useMorseInput(options: UseMorseInputOptions = {}): UseMorseInput
   const { sequence, error } = state
   useEffect(() => {
     if (!error) return
-    const id = window.setTimeout(() => dispatch({ type: 'clearError' }), errorFlashMs)
+    const id = window.setTimeout(() => dispatch({ type: 'clearError' }), ERROR_FLASH_MS)
     return () => window.clearTimeout(id)
-  }, [error, errorFlashMs])
+  }, [error])
 
   useEffect(() => {
-    if (!keyboard) return
     // Ctrl/Alt/Meta combinations are browser or OS shortcuts, not Morse input.
     // Alt on its own is the dot key, so its own event (altKey is true) is allowed.
     const ignored = (event: KeyboardEvent) =>
@@ -170,19 +162,7 @@ export function useMorseInput(options: UseMorseInputOptions = {}): UseMorseInput
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [keyboard])
+  }, [])
 
-  return useMemo(
-    () => ({
-      sequence,
-      text: state.text,
-      error: error?.text ?? null,
-      addDot,
-      addDash,
-      confirm,
-      deleteLast,
-      reset,
-    }),
-    [sequence, state.text, error, addDot, addDash, confirm, deleteLast, reset],
-  )
+  return { sequence, text: state.text, error: error?.text ?? null, addDot, addDash, confirm, deleteLast, reset }
 }

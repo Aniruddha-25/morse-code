@@ -62,8 +62,3 @@ export interface BoardLayout {
   readonly nodes: readonly NodeLayout[]
   readonly segments: readonly CircuitSegment[]
 }
-
-export interface MorseTiming {
-  /** How long the red "invalid input" flash lasts. */
-  readonly errorFlashMs: number
-}

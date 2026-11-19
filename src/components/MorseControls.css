@@ -36,15 +36,6 @@
     0 0 14px color-mix(in srgb, var(--led-signal) 55%, transparent);
 }
 
-.morse-controls__button--confirm {
-  border-color: var(--led-signal);
-}
-
-.morse-controls__button:focus-visible {
-  outline: 2px solid var(--led-signal);
-  outline-offset: 2px;
-}
-
 /* Pad shapes matching the board nodes (see MorseNode.css). */
 .morse-controls__shape {
   display: grid;
@@ -103,12 +94,5 @@
 @media (hover: hover) and (pointer: fine) {
   .morse-controls__key {
     display: block;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .morse-controls__button,
-  .morse-controls__shape {
-    transition: none;
   }
 }

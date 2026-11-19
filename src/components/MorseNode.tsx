@@ -1,15 +1,9 @@
 import { memo, type CSSProperties } from 'react'
-import type { NodeShape, NodeState } from '../morse/types'
+import type { NodeLayout, NodeShape, NodeState } from '../morse/types'
 import './MorseNode.css'
 
-export interface MorseNodeProps {
-  letter: string | null
-  shape: NodeShape
-  /** Center and size, in board units. */
-  x: number
-  y: number
-  width: number
-  height: number
+/** Position and size are in board units (see NodeLayout). */
+export interface MorseNodeProps extends Pick<NodeLayout, 'letter' | 'shape' | 'x' | 'y' | 'width' | 'height'> {
   state: NodeState
   /** Stage at which the node lights after the traces leading to it. */
   stage: number

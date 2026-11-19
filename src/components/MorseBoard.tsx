@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { memo, type CSSProperties } from 'react'
 import { BOARD_LAYOUT, NODE_STAGE } from '../morse/boardLayout'
 import { isSegmentLit, nodeStateFor } from '../morse/illumination'
 import type { MorseCode } from '../morse/types'
@@ -21,8 +21,10 @@ const boardStyle = { aspectRatio: `${width} / ${height}` } as CSSProperties
 const surfaceStyle = { '--u': `calc(100cqw / ${width})` } as CSSProperties
 
 const MOUNTING_HOLES = ['tl', 'tr', 'bl', 'br'] as const
+const LEGEND = ['dot', 'dash'] as const
 
-export function MorseBoard({ activeCode, error }: MorseBoardProps) {
+/** Memoised: a theme switch re-renders App but leaves the board's props unchanged. */
+export const MorseBoard = memo(function MorseBoard({ activeCode, error }: MorseBoardProps) {
   return (
     <div className="morse-board-fit" style={fitStyle}>
       <div className="morse-board" style={boardStyle} data-error={error}>
@@ -41,42 +43,22 @@ export function MorseBoard({ activeCode, error }: MorseBoardProps) {
             <span>CODE</span>
           </div>
           <div className="morse-board__silk morse-board__silk--legend" aria-hidden="true">
-            <span className="morse-board__legend-row">
-              <i className="morse-board__legend-dot" /> DOT
-            </span>
-            <span className="morse-board__legend-row">
-              <i className="morse-board__legend-dash" /> DASH
-            </span>
+            {LEGEND.map((shape) => (
+              <span key={shape} className="morse-board__legend-row">
+                <i className={`morse-board__legend-${shape}`} /> {shape.toUpperCase()}
+              </span>
+            ))}
           </div>
 
           {segments.map((segment) => (
-            <CircuitLine
-              key={segment.id}
-              orientation={segment.orientation}
-              x={segment.x}
-              y={segment.y}
-              length={segment.length}
-              reverse={segment.reverse}
-              stage={segment.stage}
-              lit={isSegmentLit(segment, activeCode)}
-            />
+            <CircuitLine key={segment.id} {...segment} lit={isSegmentLit(segment, activeCode)} />
           ))}
 
           {nodes.map((node) => (
-            <MorseNode
-              key={node.code}
-              letter={node.letter}
-              shape={node.shape}
-              x={node.x}
-              y={node.y}
-              width={node.width}
-              height={node.height}
-              state={nodeStateFor(node.code, activeCode)}
-              stage={NODE_STAGE}
-            />
+            <MorseNode key={node.code} {...node} state={nodeStateFor(node.code, activeCode)} stage={NODE_STAGE} />
           ))}
         </div>
       </div>
     </div>
   )
-}
+})

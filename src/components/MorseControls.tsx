@@ -8,39 +8,47 @@ export interface MorseControlsProps {
   onConfirm: () => void
 }
 
-/**
- * Touch buttons that mirror the keyboard controls. The dot and dash buttons
- * carry the same pad shapes as the board: round = dot, rectangular = dash.
- */
-export const MorseControls = memo(function MorseControls({ onDot, onDash, onDelete, onConfirm }: MorseControlsProps) {
+interface Control {
+  action: keyof MorseControlsProps
+  label: string
+  /** Keyboard key shown under the symbol where a keyboard exists. */
+  caption: string
+  symbol: string
+  /** Dot and dash carry the same pad shapes as the board: round = dot, rectangular = dash. */
+  shape?: 'dot' | 'dash'
+  variant?: 'delete' | 'confirm'
+}
+
+const CONTROLS: readonly Control[] = [
+  { action: 'onDot', label: 'Dot', caption: 'Alt', symbol: '·', shape: 'dot' },
+  { action: 'onDash', label: 'Dash', caption: 'Space', symbol: '−', shape: 'dash' },
+  { action: 'onDelete', label: 'Delete last symbol', caption: 'Backspace', symbol: '⌫', variant: 'delete' },
+  { action: 'onConfirm', label: 'Confirm character', caption: 'Enter', symbol: '↵', variant: 'confirm' },
+]
+
+/** Touch buttons that mirror the keyboard controls. */
+export const MorseControls = memo(function MorseControls(handlers: MorseControlsProps) {
   return (
     <div className="morse-controls" role="group" aria-label="Morse input">
-      <button type="button" className="morse-controls__button" onClick={onDot} aria-label="Dot">
-        <span className="morse-controls__shape morse-controls__shape--dot" aria-hidden="true">·</span>
-        <span className="morse-controls__key" aria-hidden="true">Alt</span>
-      </button>
-      <button type="button" className="morse-controls__button" onClick={onDash} aria-label="Dash">
-        <span className="morse-controls__shape morse-controls__shape--dash" aria-hidden="true">−</span>
-        <span className="morse-controls__key" aria-hidden="true">Space</span>
-      </button>
-      <button
-        type="button"
-        className="morse-controls__button morse-controls__button--delete"
-        onClick={onDelete}
-        aria-label="Delete last symbol"
-      >
-        <span className="morse-controls__glyph" aria-hidden="true">⌫</span>
-        <span className="morse-controls__key" aria-hidden="true">Backspace</span>
-      </button>
-      <button
-        type="button"
-        className="morse-controls__button morse-controls__button--confirm"
-        onClick={onConfirm}
-        aria-label="Confirm character"
-      >
-        <span className="morse-controls__glyph" aria-hidden="true">↵</span>
-        <span className="morse-controls__key" aria-hidden="true">Enter</span>
-      </button>
+      {CONTROLS.map(({ action, label, caption, symbol, shape, variant }) => (
+        <button
+          key={action}
+          type="button"
+          className={`morse-controls__button${variant ? ` morse-controls__button--${variant}` : ''}`}
+          onClick={handlers[action]}
+          aria-label={label}
+        >
+          <span
+            className={shape ? `morse-controls__shape morse-controls__shape--${shape}` : 'morse-controls__glyph'}
+            aria-hidden="true"
+          >
+            {symbol}
+          </span>
+          <span className="morse-controls__key" aria-hidden="true">
+            {caption}
+          </span>
+        </button>
+      ))}
     </div>
   )
 })

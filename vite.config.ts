@@ -8,8 +8,9 @@ const repo = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? 'morse-code'
 const pagesBase = repo.endsWith('.github.io') ? '/' : `/${repo}/`
 
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
-  // Dev server stays at '/'; production builds use the Pages base path.
-  base: command === 'build' ? pagesBase : '/',
+export default defineConfig(({ command, isPreview }) => ({
+  // Dev server stays at '/'; production builds (and `vite preview`, which serves
+  // them) use the Pages base path.
+  base: command === 'build' || isPreview ? pagesBase : '/',
   plugins: [react()],
 }))

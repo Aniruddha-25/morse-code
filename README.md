@@ -106,7 +106,7 @@ npm run build  && npm run deploy
 
 | Path | Contents |
 | --- | --- |
-| `src/morse/` | Morse mapping and tree, decoder, board layout, path illumination, config |
+| `src/morse/` | Morse mapping and tree, decoder, board layout, path illumination |
 | `src/hooks/` | `useMorseInput` (input state, keyboard, errors), `useTheme` (theme state and schedule) |
 | `src/components/` | `MorseBoard`, `MorseNode`, `CircuitLine`, `MorseDisplay`, `MorseControls`, `ThemeToggle` |
 | `src/theme/` | Automatic light/dark schedule |

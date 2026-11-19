@@ -86,11 +86,6 @@
   cursor: default;
 }
 
-.morse-display__reset:focus-visible {
-  outline: 2px solid var(--led-signal);
-  outline-offset: 2px;
-}
-
 /* Reserve a line so the layout does not jump when a notice appears. */
 .morse-display__notice {
   min-height: 1.1em;
@@ -144,11 +139,5 @@
     font-size: 0.62rem;
     line-height: 1.15;
     text-align: right;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .morse-display__letter {
-    transition: none;
   }
 }

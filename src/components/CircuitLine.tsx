@@ -1,16 +1,8 @@
 import { memo, type CSSProperties } from 'react'
+import type { CircuitSegment } from '../morse/types'
 import './CircuitLine.css'
 
-export interface CircuitLineProps {
-  orientation: 'horizontal' | 'vertical'
-  /** Start point and length, in board units. */
-  x: number
-  y: number
-  length: number
-  /** Signal travels toward the start point instead of away from it. */
-  reverse: boolean
-  /** Order within a connection; later stages light after earlier ones. */
-  stage: number
+export interface CircuitLineProps extends Omit<CircuitSegment, 'id' | 'litBy'> {
   lit: boolean
 }
 

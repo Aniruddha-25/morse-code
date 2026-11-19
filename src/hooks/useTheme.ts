@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { msUntilNextSwitch, themeForDate, type Theme } from '../theme/schedule'
 
 /** 'auto' follows the local time of day; 'light' / 'dark' is a saved manual choice. */
@@ -6,8 +6,6 @@ type ThemeMode = 'auto' | Theme
 
 // Keep in sync with the inline script in index.html.
 const STORAGE_KEY = 'morse-theme'
-// How long the colour cross-fade class stays on <html> after a switch (see index.css).
-const FADE_MS = 400
 
 function readStoredMode(): ThemeMode {
   try {
@@ -66,18 +64,11 @@ export function useTheme(): UseTheme {
     }
   }, [mode])
 
-  // Apply to the page. The inline script in index.html already set the first
-  // value, so only real changes fade; reduced-motion users get none (CSS).
-  useEffect(() => {
-    const root = document.documentElement
-    if (root.getAttribute('data-theme') === theme) return
-    root.classList.add('theme-fade')
-    root.setAttribute('data-theme', theme)
-    const id = window.setTimeout(() => root.classList.remove('theme-fade'), FADE_MS)
-    return () => {
-      window.clearTimeout(id)
-      root.classList.remove('theme-fade')
-    }
+  // Apply to the page before the browser paints, in the same frame as the switch
+  // itself. The inline script in index.html already set the first value, so
+  // nothing animates on load. The colour fade is pure CSS (see index.css).
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
   const toggleTheme = useCallback(() => {

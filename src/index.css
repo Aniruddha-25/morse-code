@@ -1,8 +1,52 @@
 /*
+ * Every theme colour is a registered <color> property, so a theme switch can
+ * animate the variables themselves. Gradients, borders, shadows and text that
+ * use them then cross-fade together, with no JS timer and no per-element rules.
+ * Browsers without @property support simply switch instantly.
+ */
+@property --pcb-bg { syntax: '<color>'; inherits: true; initial-value: #070d1f; }
+@property --page-glow { syntax: '<color>'; inherits: true; initial-value: #101d45; }
+@property --pcb-board-hi { syntax: '<color>'; inherits: true; initial-value: #0f1d44; }
+@property --pcb-board { syntax: '<color>'; inherits: true; initial-value: #0c1738; }
+@property --pcb-board-lo { syntax: '<color>'; inherits: true; initial-value: #09122c; }
+@property --pcb-board-edge { syntax: '<color>'; inherits: true; initial-value: #1a2a58; }
+@property --pcb-scan { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.025); }
+@property --pcb-hole-core { syntax: '<color>'; inherits: true; initial-value: #050a18; }
+@property --pcb-hole-ring { syntax: '<color>'; inherits: true; initial-value: #1b2a55; }
+@property --pcb-hole-hi { syntax: '<color>'; inherits: true; initial-value: #3a4d80; }
+@property --pcb-trace { syntax: '<color>'; inherits: true; initial-value: #2d3d6b; }
+@property --pcb-trace-hi { syntax: '<color>'; inherits: true; initial-value: #3d507f; }
+@property --pcb-pad { syntax: '<color>'; inherits: true; initial-value: #15234a; }
+@property --pcb-pad-edge { syntax: '<color>'; inherits: true; initial-value: #4d5f8f; }
+@property --pcb-root { syntax: '<color>'; inherits: true; initial-value: #070d1f; }
+@property --pcb-silk { syntax: '<color>'; inherits: true; initial-value: #7f93c4; }
+@property --pcb-text { syntax: '<color>'; inherits: true; initial-value: #a9b8de; }
+@property --pcb-text-strong { syntax: '<color>'; inherits: true; initial-value: #e6ecff; }
+@property --error-text { syntax: '<color>'; inherits: true; initial-value: #ff8c7a; }
+@property --panel-bg { syntax: '<color>'; inherits: true; initial-value: #060b1a; }
+@property --btn-top { syntax: '<color>'; inherits: true; initial-value: #1a2a58; }
+@property --btn-bottom { syntax: '<color>'; inherits: true; initial-value: #101c40; }
+@property --btn-base { syntax: '<color>'; inherits: true; initial-value: #070d1f; }
+@property --hl { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.1); }
+@property --shade-1 { syntax: '<color>'; inherits: true; initial-value: rgba(0, 0, 0, 0.35); }
+@property --shade-2 { syntax: '<color>'; inherits: true; initial-value: rgba(0, 0, 0, 0.5); }
+@property --shade-drop { syntax: '<color>'; inherits: true; initial-value: rgba(0, 0, 0, 0.45); }
+@property --led-signal { syntax: '<color>'; inherits: true; initial-value: #3dff8a; }
+@property --led-text { syntax: '<color>'; inherits: true; initial-value: #3dff8a; }
+@property --led-error { syntax: '<color>'; inherits: true; initial-value: #ff4d4d; }
+@property --led-error-ink { syntax: '<color>'; inherits: true; initial-value: #04101f; }
+
+/*
  * Theme tokens. Dark is the default; [data-theme='light'] (set on <html> by the
  * inline script in index.html and by useTheme) overrides only the values below.
  */
 :root {
+  /*
+   * --node-* are plain (unregistered) copies of the colours the board pads use.
+   * They switch instantly, so the pads fade with their own transitions
+   * (MorseNode.css) instead of smoothing the animated tokens a second time.
+   * The matching --pcb-* tokens below are derived from them.
+   */
   /* Page */
   --pcb-bg: #070d1f;
   --page-glow: #101d45;
@@ -19,14 +63,19 @@
 
   /* Copper traces, pads and print */
   --pcb-trace: #2d3d6b;
-  --pcb-trace-hi: #3d507f;
-  --pcb-pad: #15234a;
-  --pcb-pad-edge: #4d5f8f;
-  --pcb-root: #070d1f;
+  --node-trace: #3d507f;
+  --pcb-trace-hi: var(--node-trace);
+  --node-pad: #15234a;
+  --pcb-pad: var(--node-pad);
+  --node-pad-edge: #4d5f8f;
+  --pcb-pad-edge: var(--node-pad-edge);
+  --node-root: #070d1f;
+  --pcb-root: var(--node-root);
   --pcb-silk: #7f93c4;
 
   /* Text */
-  --pcb-text: #a9b8de;
+  --node-text: #a9b8de;
+  --pcb-text: var(--node-text);
   --pcb-text-strong: #e6ecff;
   --error-text: #ff8c7a;
 
@@ -37,9 +86,12 @@
   --btn-base: #070d1f;
 
   /* Light and shadow */
-  --hl: rgba(255, 255, 255, 0.1);
-  --shade-1: rgba(0, 0, 0, 0.35);
-  --shade-2: rgba(0, 0, 0, 0.5);
+  --node-hl: rgba(255, 255, 255, 0.1);
+  --hl: var(--node-hl);
+  --node-shade-1: rgba(0, 0, 0, 0.35);
+  --shade-1: var(--node-shade-1);
+  --node-shade-2: rgba(0, 0, 0, 0.5);
+  --shade-2: var(--node-shade-2);
   --shade-drop: rgba(0, 0, 0, 0.45);
 
   /* LED colors */
@@ -77,13 +129,18 @@
   --pcb-hole-hi: #d2dbe7;
 
   --pcb-trace: #7086a5; /* circuit traces */
-  --pcb-trace-hi: #8398b5;
-  --pcb-pad: #dce3ec;
-  --pcb-pad-edge: #8fa3bf; /* borders */
-  --pcb-root: #e2e7ef;
+  --node-trace: #8398b5;
+  --pcb-trace-hi: var(--node-trace);
+  --node-pad: #dce3ec;
+  --pcb-pad: var(--node-pad);
+  --node-pad-edge: #8fa3bf; /* borders */
+  --pcb-pad-edge: var(--node-pad-edge);
+  --node-root: #e2e7ef;
+  --pcb-root: var(--node-root);
   --pcb-silk: #536780; /* secondary text */
 
-  --pcb-text: #1e304a; /* primary text */
+  --node-text: #1e304a; /* primary text */
+  --pcb-text: var(--node-text);
   --pcb-text-strong: #1e304a;
   --error-text: #b91c1c;
 
@@ -92,9 +149,12 @@
   --btn-bottom: #ced8e6; /* control buttons */
   --btn-base: #9dafc6;
 
-  --hl: rgba(255, 255, 255, 0.45);
-  --shade-1: rgba(30, 48, 74, 0.14);
-  --shade-2: rgba(30, 48, 74, 0.22);
+  --node-hl: rgba(255, 255, 255, 0.45);
+  --hl: var(--node-hl);
+  --node-shade-1: rgba(30, 48, 74, 0.14);
+  --shade-1: var(--node-shade-1);
+  --node-shade-2: rgba(30, 48, 74, 0.22);
+  --shade-2: var(--node-shade-2);
   --shade-drop: rgba(30, 48, 74, 0.2);
 
   --led-signal: #16a34a; /* active LED */
@@ -126,19 +186,57 @@ button {
 }
 
 /*
- * Colour cross-fade on a theme switch. useTheme adds .theme-fade for a moment
- * around the change, so nothing animates on first load. Components' own
- * transitions (LED paths, pads) keep priority via later source order.
+ * Theme cross-fade: the tokens above ease from one palette to the other. A
+ * switch is applied before paint (see useTheme), so nothing animates on load.
  */
-@media (prefers-reduced-motion: no-preference) {
-  :root.theme-fade,
-  :root.theme-fade *,
-  :root.theme-fade *::before,
-  :root.theme-fade *::after {
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease,
-      border-color 0.3s ease,
-      box-shadow 0.3s ease;
+:root {
+  transition-property:
+    --pcb-bg,
+    --page-glow,
+    --pcb-board-hi,
+    --pcb-board,
+    --pcb-board-lo,
+    --pcb-board-edge,
+    --pcb-scan,
+    --pcb-hole-core,
+    --pcb-hole-ring,
+    --pcb-hole-hi,
+    --pcb-trace,
+    --pcb-trace-hi,
+    --pcb-pad,
+    --pcb-pad-edge,
+    --pcb-root,
+    --pcb-silk,
+    --pcb-text,
+    --pcb-text-strong,
+    --error-text,
+    --panel-bg,
+    --btn-top,
+    --btn-bottom,
+    --btn-base,
+    --hl,
+    --shade-1,
+    --shade-2,
+    --shade-drop,
+    --led-signal,
+    --led-text,
+    --led-error,
+    --led-error-ink;
+  transition-duration: 220ms;
+  transition-timing-function: ease;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--led-signal);
+  outline-offset: 2px;
+}
+
+/* Reduced motion: every transition (theme fade, LED glow, thumb slide) becomes instant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }
