@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Morse Code Board</title>
+    <script>
+      // Runs before first paint so the page never flashes the wrong theme.
+      // A saved manual choice wins; otherwise local time decides (light 6 AM – 6 PM).
+      // Keep in sync with src/hooks/useTheme.ts and src/theme/schedule.ts.
+      (function () {
+        var theme = null;
+        try { theme = localStorage.getItem('morse-theme'); } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          var hour = new Date().getHours();
+          theme = hour >= 6 && hour < 18 ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

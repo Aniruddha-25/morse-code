@@ -1,0 +1,142 @@
+/*
+ * Slot for the board: grows to fill the height left by the other rows and is
+ * a size container, so the board can scale to whichever of its width or height
+ * is the tighter fit (cqw / cqh). The minimum height keeps the board readable
+ * on very short screens, where the page scrolls instead of shrinking it.
+ */
+.morse-board-fit {
+  --board-min-w: 19rem;
+  --board-max-w: 30rem;
+
+  flex: 1 1 0;
+  display: grid;
+  /* minmax(0, ...) so the column can shrink below the board's own width and max-width: 100% applies */
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--board-min-w) / var(--board-ratio));
+  container-type: size;
+}
+
+/*
+ * The board is an inline-size container: its surface defines --u (one board
+ * unit) as a fraction of the board's width, so nodes, traces and type all
+ * scale together and keep the PCB proportions.
+ */
+.morse-board {
+  --led: var(--led-signal);
+  --led-glow: color-mix(in srgb, var(--led) 85%, transparent);
+  --led-glow-soft: color-mix(in srgb, var(--led) 40%, transparent);
+  --seg-time: 90ms;
+
+  position: relative;
+  container-type: inline-size;
+  /* Largest board that fits the slot's width and height, within readable limits. */
+  width: clamp(
+    var(--board-min-w),
+    min(100cqw, calc(100cqh * var(--board-ratio))),
+    var(--board-max-w)
+  );
+  max-width: 100%;
+  border: 1px solid var(--pcb-board-edge);
+  border-radius: 14px;
+  background:
+    linear-gradient(var(--pcb-scan) 1px, transparent 1px) 0 0 / 100% 8px,
+    linear-gradient(160deg, var(--pcb-board-hi) 0%, var(--pcb-board) 55%, var(--pcb-board-lo) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--hl),
+    inset 0 0 40px var(--shade-1),
+    0 12px 30px var(--shade-drop);
+}
+
+/* Invalid input: the lit path and board edge flash red. */
+.morse-board[data-error='true'] {
+  --led: var(--led-error);
+  border-color: var(--led-error);
+}
+
+.morse-board__surface {
+  position: absolute;
+  inset: 0;
+  /* --u is set inline from the layout width. */
+  --trace: max(2px, calc(var(--u) * 0.1));
+}
+
+/* Corner mounting holes */
+.morse-board__hole {
+  position: absolute;
+  width: calc(var(--u) * 0.6);
+  height: calc(var(--u) * 0.6);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--pcb-hole-core) 45%,
+    var(--pcb-hole-ring) 50%,
+    var(--pcb-hole-hi) 70%,
+    var(--pcb-hole-ring) 100%
+  );
+  box-shadow: inset 0 1px 2px var(--shade-2);
+}
+
+.morse-board__hole--tl { left: calc(var(--u) * 0.35); top: calc(var(--u) * 0.35); }
+.morse-board__hole--tr { right: calc(var(--u) * 0.35); top: calc(var(--u) * 0.35); }
+.morse-board__hole--bl { left: calc(var(--u) * 0.35); bottom: calc(var(--u) * 0.35); }
+.morse-board__hole--br { right: calc(var(--u) * 0.35); bottom: calc(var(--u) * 0.35); }
+
+/* Silkscreen printing */
+.morse-board__silk {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: calc(var(--u) * 0.64);
+  line-height: 1.25;
+  letter-spacing: 0.14em;
+  color: var(--pcb-silk);
+  opacity: 0.7;
+  pointer-events: none;
+  user-select: none;
+}
+
+.morse-board__silk--title {
+  left: calc(var(--u) * 1.6);
+  top: calc(var(--u) * 0.85);
+  font-weight: 700;
+}
+
+.morse-board__silk--legend {
+  left: calc(var(--u) * 1.1);
+  bottom: calc(var(--u) * 1.2);
+  gap: calc(var(--u) * 0.35);
+}
+
+.morse-board__legend-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 0.4);
+}
+
+.morse-board__legend-dot,
+.morse-board__legend-dash {
+  display: inline-block;
+  border: 1px solid var(--pcb-silk);
+}
+
+.morse-board__legend-dot {
+  width: calc(var(--u) * 0.75);
+  height: calc(var(--u) * 0.75);
+  border-radius: 50%;
+}
+
+.morse-board__legend-dash {
+  width: calc(var(--u) * 1);
+  height: calc(var(--u) * 0.65);
+  border-radius: calc(var(--u) * 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .morse-board {
+    --seg-time: 0ms;
+  }
+}

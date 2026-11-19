@@ -1,0 +1,144 @@
+/*
+ * Theme tokens. Dark is the default; [data-theme='light'] (set on <html> by the
+ * inline script in index.html and by useTheme) overrides only the values below.
+ */
+:root {
+  /* Page */
+  --pcb-bg: #070d1f;
+  --page-glow: #101d45;
+
+  /* Board */
+  --pcb-board-hi: #0f1d44;
+  --pcb-board: #0c1738;
+  --pcb-board-lo: #09122c;
+  --pcb-board-edge: #1a2a58;
+  --pcb-scan: rgba(255, 255, 255, 0.025);
+  --pcb-hole-core: #050a18;
+  --pcb-hole-ring: #1b2a55;
+  --pcb-hole-hi: #3a4d80;
+
+  /* Copper traces, pads and print */
+  --pcb-trace: #2d3d6b;
+  --pcb-trace-hi: #3d507f;
+  --pcb-pad: #15234a;
+  --pcb-pad-edge: #4d5f8f;
+  --pcb-root: #070d1f;
+  --pcb-silk: #7f93c4;
+
+  /* Text */
+  --pcb-text: #a9b8de;
+  --pcb-text-strong: #e6ecff;
+  --error-text: #ff8c7a;
+
+  /* Panels and buttons */
+  --panel-bg: #060b1a;
+  --btn-top: #1a2a58;
+  --btn-bottom: #101c40;
+  --btn-base: #070d1f;
+
+  /* Light and shadow */
+  --hl: rgba(255, 255, 255, 0.1);
+  --shade-1: rgba(0, 0, 0, 0.35);
+  --shade-2: rgba(0, 0, 0, 0.5);
+  --shade-drop: rgba(0, 0, 0, 0.45);
+
+  /* LED colors */
+  --led-signal: #3dff8a;
+  --led-text: #3dff8a; /* green used for text on panels */
+  --led-error: #ff4d4d;
+  --led-error-ink: #04101f; /* letters on a pad lit red */
+
+  --font-ui: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  font-family: var(--font-ui);
+  line-height: 1.4;
+  color: var(--pcb-text);
+  background: var(--pcb-bg);
+  color-scheme: dark;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Muted blue-gray daytime palette (no pure white). */
+  --pcb-bg: #d5dce6; /* page */
+  --page-glow: #dfe5ee;
+
+  --pcb-board-hi: #cbd6e3;
+  --pcb-board: #c3cfde; /* circuit board */
+  --pcb-board-lo: #b9c6d7;
+  --pcb-board-edge: #8fa3bf; /* borders */
+  --pcb-scan: rgba(30, 48, 74, 0.04);
+  --pcb-hole-core: #7c8eab;
+  --pcb-hole-ring: #a9b7cc;
+  --pcb-hole-hi: #d2dbe7;
+
+  --pcb-trace: #7086a5; /* circuit traces */
+  --pcb-trace-hi: #8398b5;
+  --pcb-pad: #dce3ec;
+  --pcb-pad-edge: #8fa3bf; /* borders */
+  --pcb-root: #e2e7ef;
+  --pcb-silk: #536780; /* secondary text */
+
+  --pcb-text: #1e304a; /* primary text */
+  --pcb-text-strong: #1e304a;
+  --error-text: #b91c1c;
+
+  --panel-bg: #e2e7ef; /* output panel */
+  --btn-top: #d7dfeb;
+  --btn-bottom: #ced8e6; /* control buttons */
+  --btn-base: #9dafc6;
+
+  --hl: rgba(255, 255, 255, 0.45);
+  --shade-1: rgba(30, 48, 74, 0.14);
+  --shade-2: rgba(30, 48, 74, 0.22);
+  --shade-drop: rgba(30, 48, 74, 0.2);
+
+  --led-signal: #16a34a; /* active LED */
+  --led-text: #15803d; /* green text on the light panel */
+  --led-error: #dc2626; /* error LED */
+  --led-error-ink: #ffffff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse at 50% 0%, var(--page-glow) 0%, transparent 60%),
+    var(--pcb-bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/*
+ * Colour cross-fade on a theme switch. useTheme adds .theme-fade for a moment
+ * around the change, so nothing animates on first load. Components' own
+ * transitions (LED paths, pads) keep priority via later source order.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :root.theme-fade,
+  :root.theme-fade *,
+  :root.theme-fade *::before,
+  :root.theme-fade *::after {
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+}

@@ -1,0 +1,150 @@
+/*
+ * Premium pill switch, level with the heading (positioned inside .app__header).
+ * Track 76 x 40 with a 1px border leaves a 74 x 38 inner area; the 32px thumb sits
+ * --inset (3px) from every inner edge, so spacing is equal all round and the thumb
+ * travels 74 - 32 - 2 * 3 = 36px. aria-checked="true" means Dark Mode.
+ */
+.theme-switch {
+  --w: 76px;
+  --h: 40px;
+  --thumb: 32px;
+  --inset: 3px;
+  --travel: calc(var(--w) - 2px - var(--thumb) - var(--inset) * 2);
+  /* Uniform shrink on narrow or short screens (see the media queries below). */
+  --scale-w: 1;
+  --scale-h: 1;
+  --scale: min(var(--scale-w), var(--scale-h));
+
+  --track: #b8c5d6;
+  --track-hover: #aebccf;
+  --track-border: #94a3b8;
+  --track-inset: rgba(0, 0, 0, 0.18);
+  --thumb-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  --thumb-shadow-hover: 0 3px 9px rgba(0, 0, 0, 0.32);
+
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%) scale(var(--scale));
+  transform-origin: right center;
+  z-index: 1;
+  box-sizing: border-box;
+  width: var(--w);
+  height: var(--h);
+  padding: 0;
+  border: 1px solid var(--track-border);
+  border-radius: 999px;
+  background: var(--track);
+  cursor: pointer;
+  box-shadow: inset 0 2px 4px var(--track-inset);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* Dark Mode */
+.theme-switch[aria-checked='true'] {
+  --track: #303238;
+  --track-hover: #3a3d45;
+  --track-border: #555963;
+  --track-inset: rgba(0, 0, 0, 0.45);
+}
+
+/* Larger invisible tap area (matters once the switch is scaled down). */
+.theme-switch::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+}
+
+.theme-switch:focus-visible {
+  outline: 2px solid var(--led-signal);
+  outline-offset: 2px;
+}
+
+/* White thumb carrying the active theme's icon: left = Light, right = Dark. */
+.theme-switch__thumb {
+  position: absolute;
+  top: var(--inset);
+  left: var(--inset);
+  display: grid;
+  place-items: center;
+  width: var(--thumb);
+  height: var(--thumb);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: var(--thumb-shadow);
+}
+
+.theme-switch[aria-checked='true'] .theme-switch__thumb {
+  transform: translateX(var(--travel));
+}
+
+.theme-switch__icon {
+  display: block; /* no inline baseline gap, so the icon is truly centred */
+  width: 18px;
+  height: 18px;
+}
+
+.theme-switch__icon--sun {
+  color: #d97706;
+}
+
+.theme-switch__icon--moon {
+  color: #252b3b;
+}
+
+/* Subtle hover: only where a pointer can really hover. */
+@media (hover: hover) {
+  .theme-switch:hover {
+    background: var(--track-hover);
+  }
+
+  .theme-switch:hover .theme-switch__thumb {
+    box-shadow: var(--thumb-shadow-hover);
+  }
+}
+
+/*
+ * Two classes (not one) so this beats the page-wide colour cross-fade in
+ * index.css, which would otherwise drop the slide while a theme change fades.
+ */
+.theme-switch .theme-switch__thumb {
+  transition:
+    transform 250ms ease,
+    box-shadow 0.2s ease;
+}
+
+/* The heading needs room on phones: keep the design, scale it down uniformly. */
+@media (max-width: 30rem) {
+  .theme-switch {
+    --scale-w: 0.8;
+  }
+}
+
+@media (max-width: 22.5rem) {
+  .theme-switch {
+    --scale-w: 0.75;
+  }
+}
+
+@media (max-width: 20.5rem) {
+  .theme-switch {
+    --scale-w: 0.65;
+  }
+}
+
+/* Very short windows: the page's row gap shrinks, so don't let the switch touch the panel below. */
+@media (max-height: 480px) {
+  .theme-switch {
+    --scale-h: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch,
+  .theme-switch .theme-switch__thumb {
+    transition: none;
+  }
+}

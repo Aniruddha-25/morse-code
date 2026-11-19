@@ -1,0 +1,66 @@
+/*
+ * One-screen layout: a column that is at least the viewport tall. The board's
+ * slot (.morse-board-fit) takes all the height the other rows leave over, and
+ * the board scales into it. Spacing eases with viewport height (dvh) so short
+ * screens give the space to the board, within the readable minimum set there.
+ * Safe-area insets (notches, home indicator) are added to the padding; they are
+ * 0 on devices without them, and need viewport-fit=cover in index.html.
+ * On short screens (phones) a compact variant below trims padding and gaps.
+ */
+.app {
+  --gap: clamp(0.4rem, 1.5dvh, 0.75rem);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap);
+  width: 100%;
+  min-height: 100dvh;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding:
+    calc(clamp(0.5rem, 1.5dvh, 0.75rem) + env(safe-area-inset-top))
+    calc(1rem + env(safe-area-inset-right))
+    calc(clamp(0.5rem, 1.5dvh, 1rem) + env(safe-area-inset-bottom))
+    calc(1rem + env(safe-area-inset-left));
+}
+
+/* Short screens (e.g. iPhone SE 375 x 667): tighter padding and row gaps. */
+@media (max-height: 46rem) {
+  .app {
+    --gap: 0.4rem;
+
+    padding:
+      calc(0.4rem + env(safe-area-inset-top))
+      calc(0.75rem + env(safe-area-inset-right))
+      calc(0.4rem + env(safe-area-inset-bottom))
+      calc(0.75rem + env(safe-area-inset-left));
+  }
+}
+
+.app__header {
+  position: relative; /* anchors the theme switch (ThemeToggle.css) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+  /* Keep the title centred and clear of the theme switch at the right. */
+  padding-inline: 3.5rem;
+}
+
+/* Narrow phones: a little less side padding so the heading stays on one line. */
+@media (max-width: 22.5rem) {
+  .app__header {
+    padding-inline: 3.25rem;
+  }
+}
+
+.app__title {
+  margin: 0;
+  font-size: clamp(0.85rem, 4.6vw, 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pcb-text-strong);
+}

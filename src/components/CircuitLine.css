@@ -1,0 +1,70 @@
+/* Copper trace: a dim track with a bright "signal" that grows along it. */
+.circuit-line {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  border-radius: 1px;
+  background: linear-gradient(var(--pcb-trace-hi), var(--pcb-trace));
+  pointer-events: none;
+}
+
+.circuit-line--horizontal {
+  width: calc(var(--len) * var(--u));
+  height: var(--trace);
+  transform: translateY(-50%);
+}
+
+/* Vertical runs overhang by one trace width so elbows join without notches. */
+.circuit-line--vertical {
+  width: var(--trace);
+  height: calc(var(--len) * var(--u) + var(--trace));
+  transform: translate(-50%, calc(var(--trace) * -0.5));
+  background: linear-gradient(90deg, var(--pcb-trace-hi), var(--pcb-trace));
+}
+
+.circuit-line__signal {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--led);
+  box-shadow:
+    0 0 calc(var(--u) * 0.3) var(--led-glow),
+    0 0 calc(var(--u) * 0.8) var(--led-glow-soft);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  /* Unlit: fade, then collapse back to the source end. */
+  transition:
+    opacity 0.22s ease,
+    transform 0s linear 0.22s,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.circuit-line--vertical .circuit-line__signal {
+  transform: scaleY(0);
+  transform-origin: center top;
+}
+
+.circuit-line--vertical.circuit-line--reverse .circuit-line__signal {
+  transform-origin: center bottom;
+}
+
+/* Lit: the signal travels in, each stage starting after the previous one. */
+.circuit-line--lit .circuit-line__signal {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0s linear,
+    transform var(--seg-time) linear calc(var(--stage) * var(--seg-time)),
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circuit-line__signal,
+  .circuit-line--lit .circuit-line__signal {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+}

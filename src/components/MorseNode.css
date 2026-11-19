@@ -1,0 +1,119 @@
+/* Letter pads: round = dot, rectangular = dash. Lit pads act like LEDs. */
+.morse-node {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--pcb-pad-edge);
+  background-color: var(--pcb-pad);
+  color: var(--pcb-text);
+  font-family: var(--font-ui);
+  font-size: calc(var(--u) * 0.86);
+  font-weight: 700;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 0 var(--hl),
+    inset 0 -2px 3px var(--shade-1),
+    0 1px 2px var(--shade-2);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.3s ease;
+  user-select: none;
+}
+
+.morse-node--root,
+.morse-node--dot {
+  border-radius: 50%;
+}
+
+.morse-node--dash {
+  border-radius: calc(var(--u) * 0.22);
+}
+
+/* Specular highlight on the LED lens */
+.morse-node::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.55), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* The root is the signal source pad */
+.morse-node--root {
+  border-width: 2px;
+  border-color: var(--pcb-trace-hi);
+  background-color: var(--pcb-root);
+}
+
+.morse-node__letter {
+  position: relative;
+  z-index: 1;
+}
+
+.morse-node--trail,
+.morse-node--current {
+  color: #04101f;
+  border-color: var(--led);
+}
+
+/* Letters on pads lit red (invalid input). */
+.morse-board[data-error='true'] .morse-node--trail,
+.morse-board[data-error='true'] .morse-node--current {
+  color: var(--led-error-ink);
+}
+
+.morse-node--trail {
+  background-color: color-mix(in srgb, var(--led) 68%, var(--pcb-pad));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 0 calc(var(--u) * 0.25) var(--led-glow-soft),
+    0 0 calc(var(--u) * 0.7) var(--led-glow-soft);
+}
+
+.morse-node--current {
+  background-color: var(--led);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 calc(var(--u) * 0.35) var(--led-glow),
+    0 0 calc(var(--u) * 1.1) var(--led-glow);
+}
+
+/* Light after the traces leading here have carried the signal. */
+.morse-node--current {
+  transition-delay: calc(var(--stage) * var(--seg-time));
+}
+
+.morse-node--trail::after,
+.morse-node--current::after {
+  opacity: 0.55;
+}
+
+.morse-node--root.morse-node--trail {
+  background-color: var(--pcb-root);
+  box-shadow:
+    0 0 calc(var(--u) * 0.3) var(--led-glow),
+    inset 0 0 calc(var(--u) * 0.3) var(--led-glow);
+}
+
+.morse-node--root.morse-node--trail::after {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .morse-node,
+  .morse-node::after,
+  .morse-node--current {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+}
