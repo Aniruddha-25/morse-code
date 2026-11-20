@@ -2,7 +2,7 @@
 
 Interactive Morse code decoder: enter dots and dashes and the matching path lights up on a circuit-board decoding tree.
 
-**[Live Demo](https://aniruddha-25.github.io/morse-code/)**
+**[(https://aniruddha-25.github.io/morse-code/](https://aniruddha-25.github.io/morse-code/)**
 
 ## Features
 
