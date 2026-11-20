@@ -16,14 +16,12 @@ export interface ThemeToggleProps {
  */
 export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
   const dark = theme === 'dark'
-  const title = dark ? 'Switch to light mode' : 'Switch to dark mode'
   return (
     <button
       type="button"
       role="switch"
       aria-checked={dark}
       aria-label="Dark mode"
-      title={title}
       className="theme-switch"
       data-native-keys
       onClick={onToggle}

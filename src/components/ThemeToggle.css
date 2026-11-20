@@ -72,6 +72,11 @@
   box-shadow: var(--thumb-shadow);
 }
 
+/* Light Mode: dark thumb carrying a white sun. */
+.theme-switch[aria-checked='false'] .theme-switch__thumb {
+  background: #1f2430;
+}
+
 .theme-switch[aria-checked='true'] .theme-switch__thumb {
   transform: translateX(var(--travel));
 }
@@ -83,7 +88,7 @@
 }
 
 .theme-switch__icon--sun {
-  color: #d97706;
+  color: #ffffff;
 }
 
 .theme-switch__icon--moon {
